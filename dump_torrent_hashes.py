@@ -8,7 +8,7 @@ whose columns contain the sorted, de-duplicated infohashes reported by that host
 
 Example output:
 
-    http://10.0.0.5:8080,http://10.0.0.5:8081
+    http://qb1.local:8080,http://qb2.local:8081
     0123456789abcdef...,fedcba9876543210...
     abcdef0123456789...,
 

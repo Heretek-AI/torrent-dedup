@@ -1,5 +1,17 @@
 # Local credentials and generated output
 qbittorrent-hosts.csv
 torrent-hashes.csv
+torrent-hashes-duplicates.csv
+dedup-inventory-*.jsonl
+dedup-inventory-*.hosts.csv
+.dedup-inventory-*.part
+dedup-plan*.csv
+dedup-plan-summary*.txt
+dedup-apply-*.log
+dedup-verify-*.csv
+backups/
+
+# LibreOffice lock files
+.~lock.*#
 
 __pycache__/

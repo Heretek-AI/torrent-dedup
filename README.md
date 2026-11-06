@@ -42,5 +42,27 @@ fail still get a column (empty) and are reported on the console.
 
 Exit codes: `0` all hosts succeeded, `1` some failed, `2` none succeeded.
 
-Both `qbittorrent-hosts.csv` and `torrent-hashes.csv` are gitignored because
-they contain credentials and local data.
+## Filter duplicates
+
+`filter_duplicates.py` reads `torrent-hashes.csv` and writes a new CSV with the
+same columns but only the infohashes that appear on two or more hosts. Hashes
+unique to a single host are removed. The input file is never modified.
+
+```bash
+python filter_duplicates.py
+```
+
+Output is written to `torrent-hashes-duplicates.csv`. Because columns are
+independent lists, a duplicated hash can sit on different rows in each host's
+column; the console summary reports how many duplicate hashes exist and how
+many extra copies that represents.
+
+| Option | Default | Description |
+|---|---|---|
+| `--input` | `torrent-hashes.csv` | Source CSV |
+| `--out` | `torrent-hashes-duplicates.csv` | Filtered CSV |
+| `--min-hosts` | `2` | Keep hashes present on at least this many hosts |
+
+`qbittorrent-hosts.csv`, `torrent-hashes.csv`, and
+`torrent-hashes-duplicates.csv` are gitignored because they contain credentials
+and local data.
