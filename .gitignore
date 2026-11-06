@@ -1,0 +1,5 @@
+# Local credentials and generated output
+qbittorrent-hosts.csv
+torrent-hashes.csv
+
+__pycache__/
