@@ -1,0 +1,66 @@
+# Standardized Lefthook v2 configuration — Profile: python-uv (Python 3.12 + uv + Ruff v0.17 + ty + pnpm)
+# Managed by Heretek-AI/.github fleet-sync. Local overrides belong in lefthook-local.yml.
+min_version: 1.10.0
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: no-local-paths
+      run: |
+        PATTERN='file:///(home|Users|root)/|/(home|Users)/[^/[:space:]"'"'"'`<>]+/(Projects|Documents|Desktop|Downloads|\.gemini|\.claude|\.codex|\.cursor)(/|[^A-Za-z0-9_-]|$)'
+        if git grep -nIE "$PATTERN" -- {staged_files}; then
+          echo "ERROR: Machine-local paths found in staged files. Use repo-relative paths or owner/name."
+          exit 1
+        fi
+
+    - name: gitleaks
+      run: |
+        if command -v gitleaks >/dev/null 2>&1; then
+          gitleaks protect --staged --redact --no-banner
+        fi
+
+    - name: python-ruff
+      glob: "*.{py,pyi}"
+      group:
+        piped: true
+        jobs:
+          - name: ruff-lint
+            stage_fixed: true
+            run: uv run ruff check --fix {staged_files}
+          - name: ruff-format
+            stage_fixed: true
+            run: uv run ruff format {staged_files}
+
+    - name: toml-taplo
+      glob: "*.toml"
+      stage_fixed: true
+      run: |
+        if command -v taplo >/dev/null 2>&1; then
+          taplo fmt {staged_files}
+        fi
+
+    - name: shellcheck
+      glob: "*.sh"
+      run: |
+        if command -v shellcheck >/dev/null 2>&1; then
+          shellcheck {staged_files}
+        else
+          bash -n {staged_files}
+        fi
+
+    - name: workflow-audit
+      glob: ".github/workflows/*.{yml,yaml}"
+      run: |
+        if command -v actionlint >/dev/null 2>&1; then actionlint {staged_files}; fi
+        if command -v zizmor >/dev/null 2>&1; then zizmor --format=plain {staged_files}; fi
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: uv-lock-check
+      run: uv lock --check
+    - name: python-typecheck
+      run: |
+        if uv run ty --version >/dev/null 2>&1; then
+          uv run ty check
+        fi
